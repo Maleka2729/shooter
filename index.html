@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<style>
+    body{
+        margin: 0;
+    }
+    #game{
+        width: 100vw;
+        height: 100vh;
+        position: relative;
+        background:black;
+    }
+
+    #player{
+        position: absolute;
+        background: red;
+    }
+
+    .ennemy{
+        background: yellow;
+        position: absolute;
+    }
+
+    .bullet{
+        background-color: violet;
+        position: absolute;
+    }
+
+</style>
+
+<body>
+    <div id="game">
+
+        <div id="player">
+        </div>
+
+    </div>
+</body>
+
+<script>
+    //init variable
+    let press = null; 
+    const bullets = [];
+    const ennemies = [];
+
+    const playerWidth = 50;
+    const playerHeight = 50;
+
+    const bulletWidth = 4;
+    const bulletHeight = 4;
+    const ennemyWidth = 50;
+    const ennemyHeight = 50;
+
+    let playerleft = ( window.innerWidth - playerWidth ) / 2;
+    let playerTop = (window.innerHeight - playerHeight );
+
+    // Dom instances
+    const game = document.getElementById('game');
+    const player = document.getElementById('player');
+
+    // Set the size and position of the player
+    player.style.width = playerWidth + 'px';
+    player.style.height = playerHeight + 'px';
+
+    // Keydown event
+    window.addEventListener('keydown', function(event){
+        code = event.keyCode;
+        press = true;
+
+        if (code == 32) {
+            const bullet = document.createElement('div')
+            bullet.style.width = bulletWidth + 'px';
+            bullet.style.height = bulletHeight + 'px';
+            bullet.style.left = parseInt(player.style.left) + ((playerWidth - bulletWidth)/ 2) + 'px';
+            bullet.style.top = player.style.top;
+            bullet.className = 'bullet';
+            game.appendChild(bullet);
+            bullets.push(bullet);
+        }
+
+
+    })
+
+    window.addEventListener('keyup', function(event){
+        code = event.keyCode;
+        press = false;
+
+
+    })
+
+    function generate_ennemies() {
+        const ennemy = document.createElement('div');
+
+        ennemy.style.width = ennemyWidth + 'px';
+        ennemy.style.height = ennemyHeight + 'px';
+        ennemy.style.left = Math.round(Math.random() * (window.innerWidth - ennemyWidth)) + 'px';
+        ennemy.style.top = 0 + 'px';
+        ennemy.className = 'ennemy'
+        game.appendChild(ennemy);
+        ennemies.push(ennemy);
+
+        setTimeout(generate_ennemies, Math.round(Math.random() * 500));
+        
+    }
+
+    generate_ennemies();
+
+    function draw(){
+
+        if(press && code == 39 && playerleft <= window.innerWidth - playerWidth)
+        playerleft = playerleft + 5;
+
+        if(press && code == 37 && playerleft >= 0 )
+        playerleft = playerleft - 5;
+
+        if(press && code == 38 && playerTop >= 0 )
+        playerTop = playerTop - 5;
+
+        if(press && code == 40 && playerTop <= window.innerWidth - playerWidth )
+        playerTop = playerTop + 5;
+
+        player.style.left = playerleft + 'px';
+        player.style.top = playerTop + 'px';
+
+        for (let index = 0; index < ennemies.length; index++) {
+            const ennemy = ennemies[index];
+            ennemy.style.top = (parseInt(ennemy.style.top) + 2 ) + 'px';
+
+            if (parseInt(ennemy.style.top) > window.innerHeight - ennemyHeight) {
+                game.removeChild(ennemy);
+                ennemies.splice(index, 1);
+            }
+        }
+
+        for (let index = 0; index < bullets.length; index++) {
+            const bullet = bullets[index];
+            bullet.style.top = (parseInt(bullet.style.top) - 2 ) + 'px';
+
+            if (parseInt(bullet.style.top) > window.innerHeight - bulletHeight) {
+                game.removeChild(bullet);
+                bullets.splice(index, 1);
+            }
+        }
+
+        window.requestAnimationFrame(draw);
+        
+    }
+
+    draw();
+
+    
+
+
+
+</script>
+
+</html>
